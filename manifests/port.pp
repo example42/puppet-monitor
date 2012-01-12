@@ -7,11 +7,11 @@ define monitor::port (
   $enable=true
   ) {
 
-  validate_bool($enable)
+  $bool_enable=any2bool($enable)
 
-  $ensure = $enable ? {
-    false => "absent",
-    true  => "present",
+  $ensure = $bool_enable ? {
+    false => 'absent',
+    true  => 'present',
   }
 
   if ($tool =~ /munin/) {
@@ -25,7 +25,7 @@ define monitor::port (
 
   if ($tool =~ /nagios/) {
     nagios::service { "$name":
-      ensure    => $ensure,
+      ensure        => $ensure,
       check_command => $protocol ? {
         tcp => $checksource ? {
           local   => "check_nrpe!check_port_tcp!${target}!${port}",
@@ -41,8 +41,8 @@ define monitor::port (
 
   if ($tool =~ /puppi/) {
     puppi::check { "$name":
-      enable   => $enable,
-      hostwide => "yes",
+      enable   => $bool_enable,
+      hostwide => 'yes',
       command  => $protocol ? {
         tcp => "check_tcp -H ${target} -p ${port}" ,
         udp => "check_udp -H ${target} -p ${port}" ,

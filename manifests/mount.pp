@@ -13,49 +13,49 @@ define monitor::mount (
   $name,
   $device,
   $fstype,
-  $options='',
-  $pass='0',
-  $remounts=true,
-  $ensure='mounted',
-  $atboot='true',
-  $only_check=false,
-  $create_dir=false,
-  $owner='root',
-  $group='root',
-  $mode='755',
-  $enable=true,
-  $tool=$monitor_tool
+  $options    ='',
+  $pass       ='0',
+  $remounts   =true,
+  $ensure     ='mounted',
+  $atboot     ='true',
+  $only_check =false,
+  $create_dir =false,
+  $owner      ='root',
+  $group      ='root',
+  $mode       ='0755',
+  $enable     =true,
+  $tool       =$monitor_tool
   ) {
 
-  validate_bool($enable)
+  $bool_enable=any2bool($enable)
+
+  $computed_ensure = $bool_enable ? {
+    false => 'absent',
+    true  => 'present',
+  }
 
   $escapedname=regsubst($name,'/','_','G')
-
-  $computed_ensure = $enable ? {
-    false => "absent",
-    true  => "present",
-  }
 
   # The mount is actually done (if $only_check != true )
   if ( $only_check != true ) {
     mount { "$name":
-      name  => "$name",
-      device  => "$device",
-      fstype  => "$fstype",
-      options => "$options",
-      pass  => "$pass",
+      name     => $name,
+      device   => $device,
+      fstype   => $fstype,
+      options  => $options,
+      pass     => $pass,
       remounts => $remounts,
-      ensure  => "$ensure",
-      atboot  => true,
+      ensure   => $ensure,
+      atboot   => true,
     }
   }
 
   if ( $create_dir == true ) and ( $only_check != true ) {
     file { "$name":
-      path  => "$name",
-      owner   => "$owner",
-      group   => "$group",
-      mode  => "$mode",
+      path    => $name,
+      owner   => $owner,
+      group   => $group,
+      mode    => $mode,
       ensure  => directory,
       before  => Mount["$name"],
     }
@@ -63,7 +63,7 @@ define monitor::mount (
 
   if ($tool =~ /nagios/) {
     nagios::service { "Mount_$escapedname":
-      ensure    => $computed_ensure,
+      ensure        => $computed_ensure,
       check_command => "check_nrpe!check_mount!${name}!${fstype}",
     }
   }
@@ -71,7 +71,7 @@ define monitor::mount (
   if ($tool =~ /puppi/) {
     puppi::check { "Mount_$escapedname":
       enable   => $enable,
-      hostwide => "yes",
+      hostwide => 'yes',
       command  => "check_mount -m ${name} -t ${fstype}" ,
     }
   }

@@ -6,11 +6,12 @@ define monitor::process (
   $tool,
   $enable=true
   ) {
-  validate_bool($enable)
 
-  $ensure = $enable ? {
-    false => "absent",
-    true  => "present",
+  $bool_enable=any2bool($enable)
+
+  $ensure = $bool_enable ? {
+    false => 'absent',
+    true  => 'present',
   }
 
   if ($tool =~ /munin/) {
@@ -21,17 +22,17 @@ define monitor::process (
 
   if ($tool =~ /monit/) {
     monit::checkpid { "${name}":
-      pidfile      => "${pidfile}",
-      process      => "${process}${argument}",
+      pidfile      => $pidfile,
+      process      => "$process}${argument}",
       startprogram => "/etc/init.d/${service} start",
       stopprogram  => "/etc/init.d/${service} stop",
-      enable       => $enable,
+      enable       => $bool_enable,
     }
   }
 
   if ($tool =~ /nagios/) {
     nagios::service { "$name":
-      ensure    => $ensure,
+      ensure        => $ensure,
       check_command => $process ? {
         undef   => "check_nrpe!check_process!${name}" ,
         default => $argument ? {
@@ -45,7 +46,7 @@ define monitor::process (
 
   if ($tool =~ /puppi/) {
     puppi::check { "$name":
-      enable   => $enable,
+      enable   => $bool_enable,
       hostwide => "yes",
       command  => $process ? {
         undef   => "check_procs -c 1: -C ${name}" ,
