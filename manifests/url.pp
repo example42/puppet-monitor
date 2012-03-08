@@ -28,7 +28,7 @@ define monitor::url (
 
   # If host is not provided we get it from the Url
   $computed_host = $host ? {
-    ''      => urlhostname("$url"),
+    ''      => url_parse($url,host),
     default => $host,
   }
 
