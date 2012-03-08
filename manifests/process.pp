@@ -24,7 +24,7 @@ define monitor::process (
   if ($tool =~ /monit/) {
     monit::checkpid { "${name}":
       pidfile      => $pidfile,
-      process      => "$process}${argument}",
+      process      => "${process}${argument}",
       startprogram => "/etc/init.d/${service} start",
       stopprogram  => "/etc/init.d/${service} stop",
       enable       => $bool_enable,

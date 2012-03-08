@@ -1,15 +1,16 @@
 define monitor::url (
-  $url          ='http://127.0.0.1',
-  $target       ='',
-  $port         ='80',
-  $pattern      ='',
-  $username     ='',
-  $password     ='',
-  $monitorgroup ='',
-  $useragent    ='',
   $tool,
-  $checksource  ='remote',
-  $enable       =true
+  $url          = 'http://127.0.0.1',
+  $target       = '',
+  $host         = '',
+  $port         = '80',
+  $pattern      = '',
+  $username     = '',
+  $password     = '',
+  $monitorgroup = '',
+  $useragent    = 'UrlCheck',
+  $checksource  = 'remote',
+  $enable       = true
   ) {
 
   $bool_enable=any2bool($enable)
@@ -23,6 +24,12 @@ define monitor::url (
   $computed_target = $target ? {
     ''      => url_parse($url,host),
     default => $target,
+  }
+
+  # If host is not provided we get it from the Url
+  $computed_host = $host ? {
+    ''      => urlhostname("$url"),
+    default => $host,
   }
 
   $urlq = regsubst($url , '/' , '-' , 'G') # Needed to create flag todo files seamlessly
@@ -42,9 +49,9 @@ define monitor::url (
       ensure        => $ensure,
       check_command => $checksource ? {
         local   => $username ? { # CHECK VIA NRPE STILL DOESN'T WORK WITH & and ? in URLS!
-          undef   => "check_nrpe!check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}" ,
-          ""      => "check_nrpe!check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}" ,
-          default => "check_nrpe!check_url_auth!${computed_target}!${port}!${url}!${pattern}!${username}:${password}!${useragent}" ,
+          undef   => "check_nrpe!check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}!${computed_host}" ,
+          ""      => "check_nrpe!check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}!${computed_host}" ,
+          default => "check_nrpe!check_url_auth!${computed_target}!${port}!${url}!${pattern}!${username}:${password}!${useragent}!${computed_host}" ,
         }, 
         default => $username ? { 
           undef   => "check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}" ,
@@ -66,9 +73,9 @@ define monitor::url (
       },
       project  => $monitorgroup ,
       command  => $username ? {
-        undef   => "check_http -I '${computed_target}' -p '${port}' -u '${url}' -s '${pattern}' -A '${useragent}'" ,
-        ""      => "check_http -I '${computed_target}' -p '${port}' -u '${url}' -s '${pattern}' -A '${useragent}'" ,
-        default => "check_http -I '${computed_target}' -p '${port}' -u '${url}' -s '${pattern}' -a ${username}:${password} -A '${useragent}'" ,
+        undef   => "check_http -I '${computed_target}' -p '${port}' -u '${url}' -H '${computed_host}' -r '${pattern}' -A '${useragent}'" ,
+        ""      => "check_http -I '${computed_target}' -p '${port}' -u '${url}' -H '${computed_host}' -r '${pattern}' -A '${useragent}'" ,
+        default => "check_http -I '${computed_target}' -p '${port}' -u '${url}' -H '${computed_host}' -r '${pattern}' -a ${username}:${password} -A '${useragent}'" ,
       }
     }
   }
