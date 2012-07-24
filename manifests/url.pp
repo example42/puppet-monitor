@@ -62,6 +62,26 @@ define monitor::url (
     }
   }
 
+  if ($tool =~ /icinga/) {
+    icinga::service { "$name":
+      ensure        => $ensure,
+      check_command => $checksource ? {
+        local   => $username ? { # CHECK VIA NRPE STILL DOESN'T WORK WITH & and ? in URLS!
+          undef   => "check_nrpe!check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}!${computed_host}" ,
+          ""      => "check_nrpe!check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}!${computed_host}" ,
+          default => "check_nrpe!check_url_auth!${computed_target}!${port}!${url}!${pattern}!${username}:${password}!${useragent}!${computed_host}" ,
+        },
+        default => $username ? {
+          undef   => "check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}" ,
+          ""      => "check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}" ,
+          default => "check_url_auth!${computed_target}!${port}!${url}!${pattern}!${username}:${password}!${useragent}" ,
+        },
+      },
+    }
+  }
+
+
+
   if ($tool =~ /puppi/) {
     # Use for Example42 puppi checks
     puppi::check { "$name":

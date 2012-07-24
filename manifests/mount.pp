@@ -68,6 +68,13 @@ define monitor::mount (
     }
   }
 
+  if ($tool =~ /icinga/) {
+    icinga::service { "Mount_$escapedname":
+      ensure        => $computed_ensure,
+      check_command => "check_nrpe!check_mount!${name}!${fstype}",
+    }
+  }
+
   if ($tool =~ /puppi/) {
     puppi::check { "Mount_$escapedname":
       enable   => $enable,

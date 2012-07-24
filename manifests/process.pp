@@ -45,6 +45,20 @@ define monitor::process (
     }
   }
 
+  if ($tool =~ /icinga/) {
+    icinga::service { "$name":
+      ensure        => $ensure,
+      check_command => $process ? {
+        undef   => "check_nrpe!check_process!${name}" ,
+        default => $argument ? {
+          undef   => "check_nrpe!check_process!${process}" ,
+          ""      => "check_nrpe!check_process!${process}" ,
+          default => "check_nrpe!check_processwitharg!${process}!${argument}" ,
+        }
+      }
+    }
+  }
+
   if ($tool =~ /puppi/) {
     puppi::check { "$name":
       enable   => $bool_enable,

@@ -3,11 +3,20 @@ define monitor::port (
   $protocol,
   $target,
   $tool,
-  $checksource='remote',
+  $checksource='',
   $enable=true
   ) {
 
   $bool_enable=any2bool($enable)
+  
+  $real_checksource = $checksource ? {
+    ''      => $target ? {
+      'localhost' => 'local',
+      '127.0.0.1' => 'local',
+      default     => 'remote',
+    },
+    default => $checksource,
+  }
 
   $ensure = $bool_enable ? {
     false => 'absent',
@@ -27,11 +36,27 @@ define monitor::port (
     nagios::service { "$name":
       ensure        => $ensure,
       check_command => $protocol ? {
-        tcp => $checksource ? {
+        tcp => $real_checksource ? {
           local   => "check_nrpe!check_port_tcp!${target}!${port}",
           default => "check_tcp!${port}",
         },
-        udp => $checksource ? {
+        udp => $real_checksource ? {
+          local   => "check_nrpe!check_port_udp!${target}!${port}",
+          default => "check_udp!${port}",
+        },
+      }
+    }
+  }
+
+  if ($tool =~ /icinga/) {
+    icinga::service { "$name":
+      ensure        => $ensure,
+      check_command => $protocol ? {
+        tcp => $real_checksource ? {
+          local   => "check_nrpe!check_port_tcp!${target}!${port}",
+          default => "check_tcp!${port}",
+        },
+        udp => $real_checksource ? {
           local   => "check_nrpe!check_port_udp!${target}!${port}",
           default => "check_udp!${port}",
         },
