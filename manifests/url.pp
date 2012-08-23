@@ -32,7 +32,8 @@ define monitor::url (
     default => $host,
   }
 
-  $urlq = regsubst($url , '/' , '-' , 'G') # Needed to create flag todo files seamlessly
+  # Needed to create flag todo files seamlessly
+  $urlq = regsubst($url , '/' , '-' , 'G')
 
   if ($tool =~ /munin/) {
   }
@@ -44,16 +45,17 @@ define monitor::url (
   }
 
   if ($tool =~ /nagios/) {
-    # Use for Example42 service checks (note: are used custom Nagios and nrpe commands)  
-    nagios::service { "$name":
+    # Use for Example42 service checks
+    # (note: are used custom Nagios and nrpe commands)  
+    nagios::service { $name:
       ensure        => $ensure,
       check_command => $checksource ? {
         local   => $username ? { # CHECK VIA NRPE STILL DOESN'T WORK WITH & and ? in URLS!
           undef   => "check_nrpe!check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}!${computed_host}" ,
           ""      => "check_nrpe!check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}!${computed_host}" ,
           default => "check_nrpe!check_url_auth!${computed_target}!${port}!${url}!${pattern}!${username}:${password}!${useragent}!${computed_host}" ,
-        }, 
-        default => $username ? { 
+        },
+        default => $username ? {
           undef   => "check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}" ,
           ""      => "check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}" ,
           default => "check_url_auth!${computed_target}!${port}!${url}!${pattern}!${username}:${password}!${useragent}" ,
@@ -63,7 +65,7 @@ define monitor::url (
   }
 
   if ($tool =~ /icinga/) {
-    icinga::service { "$name":
+    icinga::service { $name:
       ensure        => $ensure,
       check_command => $checksource ? {
         local   => $username ? { # CHECK VIA NRPE STILL DOESN'T WORK WITH & and ? in URLS!
@@ -84,7 +86,7 @@ define monitor::url (
 
   if ($tool =~ /puppi/) {
     # Use for Example42 puppi checks
-    puppi::check { "$name":
+    puppi::check { $name:
       enable   => $enable,
       hostwide => $monitorgroup ? {
         undef   => "yes" ,

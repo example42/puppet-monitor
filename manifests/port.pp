@@ -8,7 +8,7 @@ define monitor::port (
   ) {
 
   $bool_enable=any2bool($enable)
-  
+
   $real_checksource = $checksource ? {
     ''      => $target ? {
       'localhost' => 'local',
@@ -33,7 +33,7 @@ define monitor::port (
   }
 
   if ($tool =~ /nagios/) {
-    nagios::service { "$name":
+    nagios::service { $name:
       ensure        => $ensure,
       check_command => $protocol ? {
         tcp => $real_checksource ? {
@@ -49,7 +49,7 @@ define monitor::port (
   }
 
   if ($tool =~ /icinga/) {
-    icinga::service { "$name":
+    icinga::service { $name:
       ensure        => $ensure,
       check_command => $protocol ? {
         tcp => $real_checksource ? {
@@ -65,7 +65,7 @@ define monitor::port (
   }
 
   if ($tool =~ /puppi/) {
-    puppi::check { "$name":
+    puppi::check { $name:
       enable   => $bool_enable,
       hostwide => 'yes',
       command  => $protocol ? {

@@ -2,8 +2,7 @@
 #
 # A monitor define to manage NAGIOS plugins
 # It can be used to define monitoring via whatever Nagios plugin
-# Note that the tools enabled could be whatever monitoring
-# solution that is compatible or may use Nagios plugins
+# This define requires Example42 nrpe module
 #
 # == Parameters
 #
@@ -32,7 +31,7 @@
 #
 #    monitor::plugin { "Fsi_Import_Errors":
 #      plugin    => 'check_log' ,
-#      arguments => '-F /store/tomcat/fsi/logs/FSIServerImporter.$(date +%Y-%m-%d).log -O /var/tmp/FSIServerImporter.log -q SQLException',
+#      arguments => '-F /var/log/app.log -O /var/tmp/app.log -q error',
 #      tool      => [ 'puppi' , 'nagios' ],
 #    }
 #
@@ -55,8 +54,8 @@ define monitor::plugin (
     nagios::service { $safe_name:
       ensure        => $ensure,
       check_command => $checksource ? {
-          local   => "check_nrpe!${safe_name}!blank",
-          remote  => "${plugin}!${arguments}",
+        local   => "check_nrpe!${safe_name}!blank",
+        remote  => "${plugin}!${arguments}",
       },
     }
 
@@ -69,7 +68,7 @@ define monitor::plugin (
         notify  => $nrpe::manage_service_autorestart,
         replace => $nrpe::manage_file_replace,
         audit   => $nrpe::manage_audit,
-        content => "command[$safe_name]=${nrpe::pluginsdir}/${plugin} ${arguments}\n",
+        content => "command[${safe_name}]=${nrpe::pluginsdir}/${plugin} ${arguments}\n",
       }
     }
   }

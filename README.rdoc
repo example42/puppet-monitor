@@ -1,4 +1,4 @@
-# Puppet module: monitor
+= Puppet module: monitor
 
 This is a Puppet abstraction module to manage monitoring.
 
@@ -8,7 +8,7 @@ Released under the terms of Apache 2 License.
 
 Check Modulefile for dependencies.
 
-## Goal of this module
+== Goal of this module
 This module abstracts the monitoring definitions for an host or application, in order to add and use different monitoring methods, without changes on the single application modules.
 
 It's used, as an option disabled by default, in the Example42 modules and provides:
@@ -21,7 +21,7 @@ It's used, as an option disabled by default, in the Example42 modules and provid
 
 * reversable actions (you can remove a monitor resource previously defined)
 
-## Usage
+== Usage
 In order to activate automatic monitoring for the resources defined in a class you have to pass, at least, these parameters:
 
         class { "foo":
@@ -31,7 +31,7 @@ In order to activate automatic monitoring for the resources defined in a class y
 
 where monitor_tool is an array of the monitor tools you want to activate to automatically check the resources provided the defined class.
 
-In each module for applications the provide network services, by default, it's activated the monitoring to the listening port and the running process, with a syntax like this:
+In Example42 modules, when monitoring is active,  for applications that provide network services, is activated the monitoring of the listening port and the running process, with a syntax like this:
 
         monitor::port { "foo_${foo::protocol}_${foo::port}": 
           protocol => "${foo::protocol}",
@@ -60,7 +60,7 @@ Modules related to web applications generally have a monitor::url define that ch
           enable  => $foo_webapp::manage_monitor,
         }
 
-## Monitor module layout 
+== Monitor module layout 
 This monitor module is to be considered a (working) implementation, entirely based on Puppet's DSL of a (strongly needed) monitor abstraction type.
 The generic monitor defines are placed in files like:
 
@@ -69,14 +69,9 @@ The generic monitor defines are placed in files like:
         monitor/manifests/url.pp
 
 here according to the monitor_tool requested are called some specific defines relevant to the requested monitoring tools.
-Note that here you can choose different implementations of the a specific module, so you are free to change the whole module to be used for a specific monitoring tool editing just these few files.  
+Note that here you can choose different implementations of monitoring modules, so you are free to change the whole module to be used for a specific monitoring tool editing just these few files.  
 
-## Dependencies
+== Dependencies
 This is a meta-module that needs dependencies according to the monitor tools modules you use.
-It also requires PuppetLabs' stdlib and Example42's stdlib42 common modules.
+It also requires Example42's puppi module.
 IMPORTANT: You must have storeconfigs enabled on your PuppetMaster to use monitoring tools that involve a central server, like Nagios or Munin.
-
-## Status of the module
-This module is derived from the monitor module of the first generation of Example42 Puppet modules.
-
-Work and adaptation for the second generation of Example42 Puppet module is in progress, some features may be added or modified.

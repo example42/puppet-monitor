@@ -1,30 +1,33 @@
 # Define monitor::mount
 #
 # You can use this define to manage monitored mounts.
-# It automatcally monitors the mount point you specify AND IT MOUNTS it using
-# Puppet's native mount define.
-# So, generically, you just have to use monitor::mount instead of mount to manage your mountpoints
-# The possible atguments are the same of the native mount define plus the usual $tool that
-# specifies what monitor tools you can use.
-# If you want to check the mount point only, without actually mounting it via the mount define,
-# set only_check=true
+# It automatically monitors the mount point you specify
+# AND IT MAY MOUNT it using Puppet's native mount define.
+# So, generically, you just have to use monitor::mount
+# instead of mount to manage your mount points.
+# The possible arguments are the same of the native mount
+# define plus some ones what define if and how to create the mount
+# directory, if to just check the mount without managing it
+# with Puppet and the tool(s) to use for monitoring.
+# If you want to check the mount point only, without actually
+# mounting it via the mount define, set only_check=true
 #
 define monitor::mount (
   $name,
   $device,
   $fstype,
-  $options    ='',
-  $pass       ='0',
-  $remounts   =true,
-  $ensure     ='mounted',
-  $atboot     ='true',
-  $only_check =false,
-  $create_dir =false,
-  $owner      ='root',
-  $group      ='root',
-  $mode       ='0755',
-  $enable     =true,
-  $tool       =$monitor_tool
+  $options    = '',
+  $pass       = '0',
+  $remounts   = true,
+  $ensure     = 'mounted',
+  $atboot     = true,
+  $only_check = false,
+  $create_dir = false,
+  $owner      = 'root',
+  $group      = 'root',
+  $mode       = '0755',
+  $enable     = true,
+  $tool       = $::monitor_tool
   ) {
 
   $bool_enable=any2bool($enable)
@@ -38,45 +41,45 @@ define monitor::mount (
 
   # The mount is actually done (if $only_check != true )
   if ( $only_check != true ) {
-    mount { "$name":
+    mount { $name:
+      ensure   => $ensure,
       name     => $name,
       device   => $device,
       fstype   => $fstype,
       options  => $options,
       pass     => $pass,
       remounts => $remounts,
-      ensure   => $ensure,
       atboot   => true,
     }
   }
 
   if ( $create_dir == true ) and ( $only_check != true ) {
-    file { "$name":
+    file { $name:
+      ensure  => directory,
       path    => $name,
       owner   => $owner,
       group   => $group,
       mode    => $mode,
-      ensure  => directory,
-      before  => Mount["$name"],
+      before  => Mount[$name],
     }
   }
 
   if ($tool =~ /nagios/) {
-    nagios::service { "Mount_$escapedname":
+    nagios::service { "Mount_${escapedname}":
       ensure        => $computed_ensure,
       check_command => "check_nrpe!check_mount!${name}!${fstype}",
     }
   }
 
   if ($tool =~ /icinga/) {
-    icinga::service { "Mount_$escapedname":
+    icinga::service { "Mount_${escapedname}":
       ensure        => $computed_ensure,
       check_command => "check_nrpe!check_mount!${name}!${fstype}",
     }
   }
 
   if ($tool =~ /puppi/) {
-    puppi::check { "Mount_$escapedname":
+    puppi::check { "Mount_${escapedname}":
       enable   => $enable,
       hostwide => 'yes',
       command  => "check_mount -m ${name} -t ${fstype}" ,
