@@ -3,7 +3,7 @@ define monitor::process (
   $service,
   $pidfile,
   $tool,
-  $enable   = true
+  $enable   = true,
   $argument = '',
   $user     = '',
   $enable   = true
