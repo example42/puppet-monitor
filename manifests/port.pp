@@ -3,7 +3,8 @@ define monitor::port (
   $protocol,
   $target,
   $tool,
-  $checksource='',
+  $checksource  = '',
+  $template     = '',
   $enable=true
   ) {
 
@@ -35,6 +36,7 @@ define monitor::port (
   if ($tool =~ /nagios/) {
     nagios::service { $name:
       ensure        => $ensure,
+      template      => $template,
       check_command => $protocol ? {
         tcp => $real_checksource ? {
           local   => "check_nrpe!check_port_tcp!${target}!${port}",
@@ -51,6 +53,7 @@ define monitor::port (
   if ($tool =~ /icinga/) {
     icinga::service { $name:
       ensure        => $ensure,
+      template      => $template,
       check_command => $protocol ? {
         tcp => $real_checksource ? {
           local   => "check_nrpe!check_port_tcp!${target}!${port}",

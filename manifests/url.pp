@@ -8,6 +8,7 @@ define monitor::url (
   $username     = '',
   $password     = '',
   $monitorgroup = '',
+  $template     = '',
   $useragent    = 'UrlCheck',
   $checksource  = 'remote',
   $enable       = true
@@ -49,6 +50,7 @@ define monitor::url (
     # (note: are used custom Nagios and nrpe commands)  
     nagios::service { $name:
       ensure        => $ensure,
+      template      => $template,
       check_command => $checksource ? {
         local   => $username ? { # CHECK VIA NRPE STILL DOESN'T WORK WITH & and ? in URLS!
           undef   => "check_nrpe!check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}!${computed_host}" ,
@@ -67,6 +69,7 @@ define monitor::url (
   if ($tool =~ /icinga/) {
     icinga::service { $name:
       ensure        => $ensure,
+      template      => $template,
       check_command => $checksource ? {
         local   => $username ? { # CHECK VIA NRPE STILL DOESN'T WORK WITH & and ? in URLS!
           undef   => "check_nrpe!check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}!${computed_host}" ,

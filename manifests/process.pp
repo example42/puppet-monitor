@@ -6,6 +6,7 @@ define monitor::process (
   $enable   = true,
   $argument = '',
   $user     = '',
+  $template = '',
   $enable   = true
   ) {
 
@@ -35,6 +36,7 @@ define monitor::process (
   if ($tool =~ /nagios/) {
     nagios::service { $name:
       ensure        => $ensure,
+      template      => $template,
       check_command => $process ? {
         undef   => "check_nrpe!check_process!${name}" ,
         default => $argument ? {
@@ -49,6 +51,7 @@ define monitor::process (
   if ($tool =~ /icinga/) {
     icinga::service { $name:
       ensure        => $ensure,
+      template      => $template,
       check_command => $process ? {
         undef   => "check_nrpe!check_process!${name}" ,
         default => $argument ? {
