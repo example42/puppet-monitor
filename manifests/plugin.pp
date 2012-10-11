@@ -24,6 +24,11 @@
 #   local = Check is executed via Nrpe
 #   remote = Check is executed from the Nagios server
 #
+# [*template*]
+#   Template to use to manage configuration. Path is as used in
+#   content => template ( $template )
+#   Content actually depends on the monitoring tool used
+#
 # [*enable*]
 #   Use this to enable or disable the check. Default: true
 #
@@ -40,6 +45,7 @@ define monitor::plugin (
   $tool,
   $arguments   = '',
   $checksource = 'local', # Note: Remote checksource might not work properly
+  $template    = '',
   $enable      = true
   ) {
 
@@ -50,9 +56,40 @@ define monitor::plugin (
     true  => 'present',
   }
 
+  # Manage template
+  $real_template = $template ? {
+    ''      => undef,
+    default => $template,
+  }
+
   if ($tool =~ /nagios/) {
     nagios::service { $safe_name:
       ensure        => $ensure,
+      template      => $real_template,
+      check_command => $checksource ? {
+        local   => "check_nrpe!${safe_name}!blank",
+        remote  => "${plugin}!${arguments}",
+      },
+    }
+
+    # If plugin check is via nrpe, we create a local configuration entry
+    if $checksource == local {
+      file { "nrpe-check_${safe_name}":
+        ensure  => $ensure,
+        path    => "$nrpe::config_dir/check_${safe_name}.cfg",
+        require => Package['nrpe'],
+        notify  => $nrpe::manage_service_autorestart,
+        replace => $nrpe::manage_file_replace,
+        audit   => $nrpe::manage_audit,
+        content => "command[${safe_name}]=${nrpe::pluginsdir}/${plugin} ${arguments}\n",
+      }
+    }
+  }
+
+  if ($tool =~ /icinga/) {
+    icinga::service { $safe_name:
+      ensure        => $ensure,
+      template      => $real_template,
       check_command => $checksource ? {
         local   => "check_nrpe!${safe_name}!blank",
         remote  => "${plugin}!${arguments}",

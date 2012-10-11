@@ -26,6 +26,7 @@ define monitor::mount (
   $owner      = 'root',
   $group      = 'root',
   $mode       = '0755',
+  $template   = '',
   $enable     = true,
   $tool       = $::monitor_tool
   ) {
@@ -35,6 +36,12 @@ define monitor::mount (
   $computed_ensure = $bool_enable ? {
     false => 'absent',
     true  => 'present',
+  }
+
+  # Manage template
+  $real_template = $template ? {
+    ''      => undef,
+    default => $template,
   }
 
   $escapedname=regsubst($name,'/','_','G')
@@ -67,6 +74,7 @@ define monitor::mount (
   if ($tool =~ /nagios/) {
     nagios::service { "Mount_${escapedname}":
       ensure        => $computed_ensure,
+      template      => $real_template,
       check_command => "check_nrpe!check_mount!${name}!${fstype}",
     }
   }
@@ -74,6 +82,7 @@ define monitor::mount (
   if ($tool =~ /icinga/) {
     icinga::service { "Mount_${escapedname}":
       ensure        => $computed_ensure,
+      template      => $real_template,
       check_command => "check_nrpe!check_mount!${name}!${fstype}",
     }
   }

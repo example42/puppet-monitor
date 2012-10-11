@@ -12,6 +12,11 @@ define monitor::process (
 
   $bool_enable=any2bool($enable)
 
+  $real_template = $template ? {
+    ''      => undef,
+    default => $template,
+  }
+
   $ensure = $bool_enable ? {
     false => 'absent',
     true  => 'present',
@@ -36,7 +41,7 @@ define monitor::process (
   if ($tool =~ /nagios/) {
     nagios::service { $name:
       ensure        => $ensure,
-      template      => $template,
+      template      => $real_template,
       check_command => $process ? {
         undef   => "check_nrpe!check_process!${name}" ,
         default => $argument ? {
@@ -51,7 +56,7 @@ define monitor::process (
   if ($tool =~ /icinga/) {
     icinga::service { $name:
       ensure        => $ensure,
-      template      => $template,
+      template      => $real_template,
       check_command => $process ? {
         undef   => "check_nrpe!check_process!${name}" ,
         default => $argument ? {
