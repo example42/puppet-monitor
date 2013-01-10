@@ -62,21 +62,23 @@ define monitor::plugin (
     default => $template,
   }
 
+  $check_command = $checksource ? {
+    local   => "check_nrpe!${safe_name}!blank",
+    remote  => "${plugin}!${arguments}",
+  }
+
   if ($tool =~ /nagios/) {
     nagios::service { $safe_name:
       ensure        => $ensure,
       template      => $real_template,
-      check_command => $checksource ? {
-        local   => "check_nrpe!${safe_name}!blank",
-        remote  => "${plugin}!${arguments}",
-      },
+      check_command => $check_command,
     }
 
     # If plugin check is via nrpe, we create a local configuration entry
     if $checksource == local {
       file { "nrpe-check_${safe_name}":
         ensure  => $ensure,
-        path    => "$nrpe::config_dir/check_${safe_name}.cfg",
+        path    => "${nrpe::config_dir}/check_${safe_name}.cfg",
         require => Package['nrpe'],
         notify  => $nrpe::manage_service_autorestart,
         replace => $nrpe::manage_file_replace,
@@ -90,17 +92,14 @@ define monitor::plugin (
     icinga::service { $safe_name:
       ensure        => $ensure,
       template      => $real_template,
-      check_command => $checksource ? {
-        local   => "check_nrpe!${safe_name}!blank",
-        remote  => "${plugin}!${arguments}",
-      },
+      check_command => $check_command,
     }
 
     # If plugin check is via nrpe, we create a local configuration entry
     if $checksource == local {
       file { "nrpe-check_${safe_name}":
         ensure  => $ensure,
-        path    => "$nrpe::config_dir/check_${safe_name}.cfg",
+        path    => "${nrpe::config_dir}/check_${safe_name}.cfg",
         require => Package['nrpe'],
         notify  => $nrpe::manage_service_autorestart,
         replace => $nrpe::manage_file_replace,
@@ -119,4 +118,3 @@ define monitor::plugin (
   }
 
 }
-

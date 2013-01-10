@@ -51,24 +51,30 @@ define monitor::url (
   if ($tool =~ /monit/) {
   }
 
+  $local_check_command = $username ? { # CHECK VIA NRPE STILL DOESN'T WORK WITH & and ? in URLS!
+    undef   => "check_nrpe!check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}!${computed_host}" ,
+    ''      => "check_nrpe!check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}!${computed_host}" ,
+    default => "check_nrpe!check_url_auth!${computed_target}!${port}!${url}!${pattern}!${username}:${password}!${useragent}!${computed_host}" ,
+  }
+
+  $default_check_command = $username ? {
+    undef   => "check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}" ,
+    ''      => "check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}" ,
+    default => "check_url_auth!${computed_target}!${port}!${url}!${pattern}!${username}:${password}!${useragent}" ,
+  }
+
+  $check_command = $checksource ? {
+    local   => $local_check_command,
+    default => $default_check_command
+  }
+
   if ($tool =~ /nagios/) {
     # Use for Example42 service checks
-    # (note: are used custom Nagios and nrpe commands)  
+    # (note: are used custom Nagios and nrpe commands)
     nagios::service { $name:
       ensure        => $ensure,
       template      => $real_template,
-      check_command => $checksource ? {
-        local   => $username ? { # CHECK VIA NRPE STILL DOESN'T WORK WITH & and ? in URLS!
-          undef   => "check_nrpe!check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}!${computed_host}" ,
-          ""      => "check_nrpe!check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}!${computed_host}" ,
-          default => "check_nrpe!check_url_auth!${computed_target}!${port}!${url}!${pattern}!${username}:${password}!${useragent}!${computed_host}" ,
-        },
-        default => $username ? {
-          undef   => "check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}" ,
-          ""      => "check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}" ,
-          default => "check_url_auth!${computed_target}!${port}!${url}!${pattern}!${username}:${password}!${useragent}" ,
-        },
-      },
+      check_command => $check_command,
     }
   }
 
@@ -76,40 +82,29 @@ define monitor::url (
     icinga::service { $name:
       ensure        => $ensure,
       template      => $real_template,
-      check_command => $checksource ? {
-        local   => $username ? { # CHECK VIA NRPE STILL DOESN'T WORK WITH & and ? in URLS!
-          undef   => "check_nrpe!check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}!${computed_host}" ,
-          ""      => "check_nrpe!check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}!${computed_host}" ,
-          default => "check_nrpe!check_url_auth!${computed_target}!${port}!${url}!${pattern}!${username}:${password}!${useragent}!${computed_host}" ,
-        },
-        default => $username ? {
-          undef   => "check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}" ,
-          ""      => "check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}" ,
-          default => "check_url_auth!${computed_target}!${port}!${url}!${pattern}!${username}:${password}!${useragent}" ,
-        },
-      },
+      check_command => $check_command,
     }
   }
 
+  $puppi_hostwide = $monitorgroup ? {
+    undef   => 'yes' ,
+    ''      => 'yes' ,
+    default => 'no' ,
+  }
 
+  $puppi_command = $username ? {
+    undef   => "check_http -I '${computed_target}' -p '${port}' -u '${url}' -H '${computed_host}' -r '${pattern}' -A '${useragent}'" ,
+    ''      => "check_http -I '${computed_target}' -p '${port}' -u '${url}' -H '${computed_host}' -r '${pattern}' -A '${useragent}'" ,
+    default => "check_http -I '${computed_target}' -p '${port}' -u '${url}' -H '${computed_host}' -r '${pattern}' -a ${username}:${password} -A '${useragent}'" ,
+  }
 
   if ($tool =~ /puppi/) {
     # Use for Example42 puppi checks
     puppi::check { $name:
       enable   => $enable,
-      hostwide => $monitorgroup ? {
-        undef   => "yes" ,
-        ""      => "yes" ,
-        default => "no" ,
-      },
+      hostwide => $puppi_hostwide,
       project  => $monitorgroup ,
-      command  => $username ? {
-        undef   => "check_http -I '${computed_target}' -p '${port}' -u '${url}' -H '${computed_host}' -r '${pattern}' -A '${useragent}'" ,
-        ""      => "check_http -I '${computed_target}' -p '${port}' -u '${url}' -H '${computed_host}' -r '${pattern}' -A '${useragent}'" ,
-        default => "check_http -I '${computed_target}' -p '${port}' -u '${url}' -H '${computed_host}' -r '${pattern}' -a ${username}:${password} -A '${useragent}'" ,
-      }
+      command  => $puppi_command,
     }
   }
-
 }
-
