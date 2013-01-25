@@ -7,7 +7,6 @@ define monitor::process (
   $argument = '',
   $user     = '',
   $template = '',
-  $enable   = true
   ) {
 
   $bool_enable=any2bool($enable)
