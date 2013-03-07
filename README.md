@@ -1,4 +1,4 @@
-= Puppet module: monitor
+# Puppet module: monitor
 
 This is a Puppet abstraction module to manage monitoring.
 
@@ -8,7 +8,7 @@ Released under the terms of Apache 2 License.
 
 Check Modulefile for dependencies.
 
-== Goal of this module
+## Goal of this module
 This module abstracts the monitoring definitions for an host or application, in order to add and use different monitoring methods, without changes on the single application modules.
 
 It's used, as an option disabled by default, in the Example42 modules and provides:
@@ -21,7 +21,7 @@ It's used, as an option disabled by default, in the Example42 modules and provid
 
 * reversable actions (you can remove a monitor resource previously defined)
 
-== Usage
+## Usage
 In order to activate automatic monitoring for the resources defined in a class you have to pass, at least, these parameters:
 
         class { "foo":
@@ -60,7 +60,7 @@ Modules related to web applications generally have a monitor::url define that ch
           enable  => $foo_webapp::manage_monitor,
         }
 
-== Monitor module layout 
+## Monitor module layout 
 This monitor module is to be considered a (working) implementation, entirely based on Puppet's DSL of a (strongly needed) monitor abstraction type.
 The generic monitor defines are placed in files like:
 
@@ -71,7 +71,7 @@ The generic monitor defines are placed in files like:
 here according to the monitor_tool requested are called some specific defines relevant to the requested monitoring tools.
 Note that here you can choose different implementations of monitoring modules, so you are free to change the whole module to be used for a specific monitoring tool editing just these few files.  
 
-== Dependencies
+## Dependencies
 This is a meta-module that needs dependencies according to the monitor tools modules you use.
 It also requires Example42's puppi module.
 IMPORTANT: You must have storeconfigs enabled on your PuppetMaster to use monitoring tools that involve a central server, like Nagios or Munin.
