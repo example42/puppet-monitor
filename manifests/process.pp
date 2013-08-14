@@ -37,6 +37,16 @@ define monitor::process (
     }
   }
 
+  if ($tool =~ /bluepill/) {
+    bluepill::process { $name:
+      pidfile      => $pidfile,
+      process      => "${process}${argument}",
+      startprogram => "/etc/init.d/${service} start",
+      stopprogram  => "/etc/init.d/${service} stop",
+      enable       => $bool_enable,
+    }
+  }
+
   $default_check_command = $argument ? {
     undef   => "check_nrpe!check_process!${process}",
     ''      => "check_nrpe!check_process!${process}",
