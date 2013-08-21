@@ -3,10 +3,16 @@ define monitor::process (
   $service,
   $pidfile,
   $tool,
-  $enable   = true,
-  $argument = '',
-  $user     = '',
-  $template = ''
+  $enable       = true,
+  $argument     = '',
+  $user         = '',
+  $template     = '',
+  $cpu_below    = '',
+  $cpu_times    = undef,
+  $cpu_every    = undef,
+  $memory_below = '',
+  $memory_times = undef,
+  $memory_every = undef
   ) {
 
   $bool_enable=any2bool($enable)
@@ -54,6 +60,12 @@ define monitor::process (
       startprogram => "/etc/init.d/${service} start",
       stopprogram  => "/etc/init.d/${service} stop",
       enable       => $bool_enable,
+      cpu_below    => $cpu_below,
+      cpu_times    => $cpu_times,
+      cpu_every    => $cpu_every,
+      memory_below => $memory_below,
+      memory_times => $memory_times,
+      memory_every => $memory_every,
     }
   }
 
