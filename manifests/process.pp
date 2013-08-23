@@ -3,10 +3,11 @@ define monitor::process (
   $service,
   $pidfile,
   $tool,
-  $enable   = true,
-  $argument = '',
-  $user     = '',
-  $template = ''
+  $enable       = true,
+  $argument     = '',
+  $user         = '',
+  $template     = '',
+  $config_hash  = {}
   ) {
 
   $bool_enable=any2bool($enable)
@@ -44,6 +45,7 @@ define monitor::process (
       startprogram => "/etc/init.d/${service} start",
       stopprogram  => "/etc/init.d/${service} stop",
       enable       => $bool_enable,
+      config_hash  => $config_hash,
     }
   }
 
@@ -54,6 +56,7 @@ define monitor::process (
       startprogram => "/etc/init.d/${service} start",
       stopprogram  => "/etc/init.d/${service} stop",
       enable       => $bool_enable,
+      config_hash  => $config_hash,
     }
   }
 
