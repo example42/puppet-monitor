@@ -49,6 +49,8 @@ define monitor::plugin (
   $enable      = true
   ) {
 
+  include nrpe
+  
   $bool_enable = any2bool($enable)
   $safe_name = regsubst($name, '(/| )', '_', 'G')
   $ensure = $bool_enable ? {
