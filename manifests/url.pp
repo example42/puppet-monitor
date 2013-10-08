@@ -11,7 +11,7 @@ define monitor::url (
   $template     = '',
   $useragent    = 'UrlCheck',
   $checksource  = 'remote',
-  $options      = '',
+  $options_hash = {},
   $enable       = true
   ) {
 
@@ -76,7 +76,7 @@ define monitor::url (
       ensure        => $ensure,
       template      => $real_template,
       check_command => $check_command,
-      options       => $options,
+      options_hash  => $options_hash,
     }
   }
 

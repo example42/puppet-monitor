@@ -29,7 +29,7 @@
 #   content => template ( $template )
 #   Content actually depends on the monitoring tool used
 #
-# [*options*]
+# [*options_hash*]
 #   An hash of custom options to be used in templates for arbitrary settings.
 #
 # [*enable*]
@@ -46,11 +46,11 @@
 define monitor::plugin (
   $plugin,
   $tool,
-  $arguments   = '',
-  $checksource = 'local', # Note: Remote checksource might not work properly
-  $template    = '',
-  $options     = '',
-  $enable      = true
+  $arguments    = '',
+  $checksource  = 'local', # Note: Remote checksource might not work properly
+  $template     = '',
+  $options_hash = {},
+  $enable       = true
   ) {
 
   include nrpe
@@ -76,7 +76,7 @@ define monitor::plugin (
   if ($tool =~ /nagios/) {
     nagios::service { $safe_name:
       ensure        => $ensure,
-      options       => $options,
+      options_hash  => $options_hash,
       template      => $real_template,
       check_command => $check_command,
     }
