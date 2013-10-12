@@ -5,6 +5,7 @@ define monitor::port (
   $tool,
   $checksource  = '',
   $template     = '',
+  $options_hash = {},
   $enable=true
   ) {
 
@@ -59,6 +60,7 @@ define monitor::port (
       ensure        => $ensure,
       template      => $real_template,
       check_command => $check_command,
+      options_hash  => $options_hash,
     }
   }
 
