@@ -1,8 +1,8 @@
 define monitor::process (
   $process,
   $service,
-  $pidfile,
   $tool,
+  $pidfile      = '',
   $enable       = true,
   $argument     = '',
   $user         = '',
