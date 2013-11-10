@@ -53,8 +53,6 @@ define monitor::plugin (
   $enable       = true
   ) {
 
-  include nrpe
-  
   $bool_enable = any2bool($enable)
   $safe_name = regsubst($name, '(/| )', '_', 'G')
   $ensure = $bool_enable ? {
@@ -74,6 +72,8 @@ define monitor::plugin (
   }
 
   if ($tool =~ /nagios/) {
+    include nrpe
+
     nagios::service { $safe_name:
       ensure        => $ensure,
       options_hash  => $options_hash,
@@ -96,6 +96,8 @@ define monitor::plugin (
   }
 
   if ($tool =~ /icinga/) {
+    include nrpe
+
     icinga::service { $safe_name:
       ensure        => $ensure,
       template      => $real_template,
