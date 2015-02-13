@@ -43,15 +43,6 @@ define monitor::url (
   # Needed to create flag todo files seamlessly
   $urlq = regsubst($url , '/' , '-' , 'G')
 
-  if ($tool =~ /munin/) {
-  }
-
-  if ($tool =~ /collectd/) {
-  }
-
-  if ($tool =~ /monit/) {
-  }
-
   $local_check_command = $username ? { # CHECK VIA NRPE STILL DOESN'T WORK WITH & and ? in URLS!
     undef   => "check_nrpe!check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}!${computed_host}" ,
     ''      => "check_nrpe!check_url!${computed_target}!${port}!${url}!${pattern}!${useragent}!${computed_host}" ,

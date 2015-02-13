@@ -22,12 +22,6 @@ define monitor::process (
     true  => 'present',
   }
 
-  if ($tool =~ /munin/) {
-  }
-
-  if ($tool =~ /collectd/) {
-  }
-
   if ($tool =~ /monit/) {
     monit::checkpid { $name:
       pidfile      => $pidfile,
