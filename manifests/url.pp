@@ -73,9 +73,9 @@ define monitor::url (
   }
 
   $default_check_command = $username ? {
-    undef   => "${real_check}!${computed_target}!${port}!${url}!${pattern}!${useragent}" ,
-    ''      => "${real_check}!${computed_target}!${port}!${url}!${pattern}!${useragent}" ,
-    default => "${real_check}!${computed_target}!${port}!${url}!${pattern}!${username}:${password}!${useragent}" ,
+    undef   => "${real_check}!${computed_target}!${computed_host}!${port}!${url}!${pattern}!${useragent}" ,
+    ''      => "${real_check}!${computed_target}!${computed_host}!${port}!${url}!${pattern}!${useragent}" ,
+    default => "${real_check}!${computed_target}!${computed_host}!${port}!${url}!${pattern}!${username}:${password}!${useragent}" ,
   }
 
   $check_command = $checksource ? {
