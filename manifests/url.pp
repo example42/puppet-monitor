@@ -43,7 +43,7 @@ define monitor::url (
   }
 
   $real_ssl = $bool_ssl ? {
-    false   => url_parse($url,scheme) {
+    false   => url_parse($url,scheme) ? {
       'https' => true,
       default => false
     },
