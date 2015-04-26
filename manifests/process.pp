@@ -1,3 +1,4 @@
+#
 define monitor::process (
   $tool,
   $process             = $name,
