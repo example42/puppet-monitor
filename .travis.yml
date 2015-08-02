@@ -16,6 +16,7 @@ matrix:
       gemfile: .gemfile
 
 gemfile: .gemfile
+sudo: false
 notifications:
   email:
     - al@lab42.it
