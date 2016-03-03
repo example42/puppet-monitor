@@ -71,7 +71,7 @@ define monitor::plugin (
     remote  => "${plugin}!${arguments}",
   }
 
-  if ($tool =~ /nagios/) {
+  if ('nagios' in $tool) {
     include nrpe
 
     nagios::service { $safe_name:
@@ -95,7 +95,7 @@ define monitor::plugin (
     }
   }
 
-  if ($tool =~ /icinga/) {
+  if ('icinga' in $tool) {
     include nrpe
 
     icinga::service { $safe_name:
@@ -118,7 +118,7 @@ define monitor::plugin (
     }
   }
 
-  if ($tool =~ /puppi/) {
+  if ('puppi' in $tool) {
     puppi::check { $safe_name:
       enable   => $bool_enable,
       hostwide => 'yes',

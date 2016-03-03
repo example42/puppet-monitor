@@ -71,7 +71,7 @@ define monitor::mount (
     }
   }
 
-  if ($tool =~ /nagios/) {
+  if ('nagios' in $tool) {
     nagios::service { "Mount_${escapedname}":
       ensure        => $computed_ensure,
       template      => $real_template,
@@ -79,7 +79,7 @@ define monitor::mount (
     }
   }
 
-  if ($tool =~ /icinga/) {
+  if ('icinga' in $tool) {
     icinga::service { "Mount_${escapedname}":
       ensure        => $computed_ensure,
       template      => $real_template,
@@ -87,7 +87,7 @@ define monitor::mount (
     }
   }
 
-  if ($tool =~ /puppi/) {
+  if ('puppi' in $tool) {
     puppi::check { "Mount_${escapedname}":
       enable   => $enable,
       hostwide => 'yes',

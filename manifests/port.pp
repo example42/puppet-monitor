@@ -47,7 +47,7 @@ define monitor::port (
     udp => $udp_check_command,
   }
 
-  if ($tool =~ /nagios/) {
+  if ('nagios' in $tool) {
     nagios::service { $name:
       ensure        => $ensure,
       template      => $real_template,
@@ -56,7 +56,7 @@ define monitor::port (
     }
   }
 
-  if ($tool =~ /icinga/) {
+  if ('icinga' in $tool) {
     icinga::service { $name:
       ensure        => $ensure,
       template      => $real_template,
@@ -68,7 +68,7 @@ define monitor::port (
     'tcp' => "check_tcp -H ${target} -p ${port}" ,
     'udp' => "check_udp -H ${target} -p ${port}" ,
   }
-  if ($tool =~ /puppi/) {
+  if ('puppi' in $tool) {
     puppi::check { $name:
       enable   => $bool_enable,
       hostwide => 'yes',
