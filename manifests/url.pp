@@ -84,7 +84,7 @@ define monitor::url (
     default => $default_check_command
   }
 
-  if ($tool =~ /nagios/) {
+  if ('nagios' in $tool) {
     # Use for Example42 service checks
     # (note: are used custom Nagios and nrpe commands)
     nagios::service { $name:
@@ -95,7 +95,7 @@ define monitor::url (
     }
   }
 
-  if ($tool =~ /icinga/) {
+  if ('icinga' in $tool) {
     icinga::service { $name:
       ensure        => $ensure,
       template      => $real_template,
@@ -115,7 +115,7 @@ define monitor::url (
     default => "check_http -I '${computed_target}' -p '${port}' -u '${url}' -H '${computed_host}' -r '${pattern}' -a ${username}:${password} -A '${useragent}'" ,
   }
 
-  if ($tool =~ /puppi/) {
+  if ('puppi' in $tool) {
     # Use for Example42 puppi checks
     puppi::check { $name:
       enable   => $enable,
